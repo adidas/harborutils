@@ -22,7 +22,7 @@ adidas is not responsible for the usage of this software for different purposes 
 Usage
 -----
 
-`
+```
 Usage:
   harborutils [command]
 
@@ -47,7 +47,7 @@ Flags:
   -p, --password string     Password
   -u, --user string         Username Harbor
 
-Use "harborutils [command] --help" for more information about a command.`
+Use "harborutils [command] --help" for more information about a command.```
   
 
 Releases
