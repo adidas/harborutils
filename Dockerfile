@@ -8,5 +8,6 @@ RUN go build -o /go/src/github.com/adidas/harborutils -ldflags "-linkmode extern
 RUN ls /root
 
 FROM scratch
+COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=0 /go/src/github.com/adidas/harborutils/harborutils /harborutils
 ENTRYPOINT ["/harborutils"]
