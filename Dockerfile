@@ -1,13 +1,13 @@
 FROM golang:1.15.8
 
-RUN go get -u gorm.io/gorm gorm.io/driver/postgres github.com/spf13/cobra github.com/howeyc/gopass
-WORKDIR /go/src/github.com/adidas/harborutils
-COPY . .
-WORKDIR /root
-RUN go build -o /go/src/github.com/adidas/harborutils -ldflags "-linkmode external -extldflags -static" /go/src/github.com/adidas/harborutils 
-RUN ls /root
+WORKDIR /build/harborutils
+
+COPY . ./
+RUN go mod download
+
+RUN go build  -o harborutils -ldflags "-linkmode external -extldflags -static" .
 
 FROM scratch
 COPY --from=0 /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=0 /go/src/github.com/adidas/harborutils/harborutils /harborutils
+COPY --from=0 /build/harborutils/harborutils /harborutils
 ENTRYPOINT ["/harborutils"]
