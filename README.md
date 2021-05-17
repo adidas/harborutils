@@ -37,8 +37,8 @@ Available Commands:
   importLdapUsers  Propagate users from primary harbor to secondary
   syncGrants       Propagate grants from primary harbor to secondary
   syncLabels       Propagate project labels from primary harbor to secondary
-  syncRobotAccount Propagate robot account from primary harbor to secundary
-  syncUsersDb      Sync useres between harbor primarty and harbor secundary
+  syncRobotAccount Propagate robot account from primary harbor to secondary
+  syncUsersDb      Sync users between harbor primary and harbor secondary
 
 Flags:
   -v, --apiVersion string   APIVersion (ie v2.0)
