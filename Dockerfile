@@ -9,4 +9,4 @@ RUN ls /root
 
 FROM scratch
 COPY --from=0 /go/src/github.com/adidas/harborutils/harborutils /harborutils
-CMD ["/harborutils"]
+ENTRYPOINT ["/harborutils"]

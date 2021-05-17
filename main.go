@@ -247,8 +247,8 @@ var importLdapGroupsCmd = &cobra.Command{
 
 var syncRobotAccountCmd = &cobra.Command{
 	Use:   "syncRobotAccount",
-	Short: "Propagate robot account from primary harbor to secundary",
-	Long:  "Propagate robot account from primary harbor to secundary",
+	Short: "Propagate robot account from primary harbor to secondary",
+	Long:  "Propagate robot account from primary harbor to secondary",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// robots := getRobots(harborServer, harborUser, harborPassword, harborAPIVersion)
@@ -273,8 +273,8 @@ var fixEmptyEmailsDbCmd = &cobra.Command{
 
 var syncUsersDbCmd = &cobra.Command{
 	Use:   "syncUsersDb",
-	Short: "Sync useres between harbor primarty and harbor secundary",
-	Long:  "Sync useres between harbor primarty and harbor secundary",
+	Short: "Sync users between harbor primary and harbor secondary",
+	Long:  "Sync users between harbor primary and harbor secondary",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		SyncUsersDatabase(clientDb(dbHostSource, dbUserSource, dbPasswordSource, dbPortSource, verbose),
@@ -374,11 +374,7 @@ func main() {
 	rootCmd.AddCommand(syncLabelsCmd)
 	rootCmd.AddCommand(importLdapUsersCmd)
 	rootCmd.AddCommand(importLdapGroupsCmd)
-	/*rootCmd.AddCommand(rmUsersFromGroupsCmd)
-	rootCmd.AddCommand(listUsersInGroupsCmd)
-	rootCmd.AddCommand(listManagedCmd)
-	rootCmd.AddCommand(listGroupsCmd)
-	rootCmd.AddCommand(whoManagesCmd)*/
+
 	rootCmd.AddCommand(syncRobotAccountCmd)
 
 	rootCmd.AddCommand(fixEmptyEmailsDbCmd)
