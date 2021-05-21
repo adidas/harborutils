@@ -255,6 +255,12 @@ var syncRobotAccountCmd = &cobra.Command{
 		// for _, robot := range robots {
 		// 	fmt.Printf("%+v", robot)
 		// }
+		if harborAPIVersion != "" {
+			harborAPIVersion = harborAPIVersion + "/"
+		}
+		if harborAPIVersionTarget != "" {
+			harborAPIVersionTarget = harborAPIVersionTarget + "/"
+		}
 		syncRobots(harborServer, harborUser, harborPassword, harborAPIVersion, harborServerTarget, harborUserTarget, harborPasswordTarget, harborAPIVersionTarget,
 			clientDb(dbHostSource, dbUserSource, dbPasswordSource, dbPortSource, verbose),
 			clientDb(dbHostTarget, dbUserTarget, dbPasswordTarget, dbPortTarget, verbose))
