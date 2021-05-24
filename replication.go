@@ -172,15 +172,7 @@ func compactReplication(server, user, password, api string, logs []AuditLog) map
 
 func replication(server, user, password, api string, startAt, finishAt time.Time, policyId int) {
 	rp := getReplicationPolicy(server, user, password, api, policyId)
-	fmt.Println(rp)
 	logs := listAuditLogs(server, user, password, api, startAt, finishAt)
-	// for _, log := range logs {
-	// 	fmt.Println(log)
-	// 	updateReplication(server, user, password, api, log.Resource, policyId, rp)
-	// 	startReplication(server, user, password, api, policyId)
-	// 	waitFinishReplication(server, user, password, api, log.Resource, policyId)
-	// 	// maybe we can remove the repeated ones
-	// }
 	c := compactReplication(server, user, password, api, logs)
 	l := len(c)
 	i := 0
