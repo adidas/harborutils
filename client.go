@@ -48,6 +48,12 @@ func client(c ClientPrt) (*http.Response, string) {
 	case RobotResponse:
 		b, _ := json.Marshal(c.Body.(RobotResponse))
 		buf.WriteString(string(b))
+	case ReplicationPolicy:
+		b, _ := json.Marshal(c.Body.(ReplicationPolicy))
+		buf.WriteString(string(b))
+	case StartReplicationExecution:
+		b, _ := json.Marshal(c.Body.(StartReplicationExecution))
+		buf.WriteString(string(b))
 	}
 
 	// fmt.Printf("+ curl -X %s %v <<< %v\n", c.Method, c.Url, buf.String())
