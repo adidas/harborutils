@@ -30,7 +30,7 @@ func getReplicationPolicy(server, user, password, apiVersion string, policyId in
 	if res.StatusCode < 399 && res.StatusCode > 100 {
 		json.Unmarshal([]byte(body), &rp)
 	} else {
-		log.Fatal("Error getting replication policy ", policyId)
+		log.Fatalf("Error getting replication policy: %d, errorCode: %d\n", policyId, res.StatusCode)
 		os.Exit(1)
 
 	}
@@ -107,7 +107,7 @@ func getLastExecution(server, user, password, apiVersion string, policyId int) R
 	if res.StatusCode < 399 && res.StatusCode > 100 {
 		json.Unmarshal([]byte(body), &r)
 	} else {
-		log.Fatal("Error getting replication Executin ", policyId)
+		log.Fatal("Error getting Execution ", policyId)
 		os.Exit(1)
 
 	}
@@ -135,7 +135,7 @@ func getReplicationExecution(server, user, password, apiVersion string, executio
 	if res.StatusCode < 399 && res.StatusCode > 100 {
 		json.Unmarshal([]byte(body), &r)
 	} else {
-		log.Fatal("Error getting replication Executin ", executionID)
+		log.Fatalf("Error getting replication Execution: %d ,errorCode %d\n", executionID, res.StatusCode)
 		os.Exit(1)
 	}
 	return r
