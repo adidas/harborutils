@@ -255,6 +255,8 @@ var syncRobotAccountCmd = &cobra.Command{
 	Long:  "Propagate robot account from primary harbor to secondary",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
+		harborAPIVersionTarget = util.ApiVersion(harborAPIVersion)
 		syncRobots(harborServer, harborUser, harborPassword, harborAPIVersion, harborServerTarget, harborUserTarget, harborPasswordTarget, harborAPIVersionTarget,
 			clientDb(dbHostSource, dbUserSource, dbPasswordSource, dbPortSource, verbose),
 			clientDb(dbHostTarget, dbUserTarget, dbPasswordTarget, dbPortTarget, verbose))
