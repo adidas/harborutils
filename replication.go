@@ -152,10 +152,11 @@ func waitFinishReplication(server, user, password, api, resource string, policyI
 	} else {
 		fmt.Printf("Replication finished: %s\n", resource)
 	}
+	fmt.Printf("=================\n")
 }
 
+// compact replication to replicate all tags in repository at once
 func compactReplication(server, user, password, api string, logs []AuditLog) map[string]string {
-	// var c map[string]string
 	c := make(map[string]string)
 
 	for _, log := range logs {
@@ -177,7 +178,7 @@ func replication(server, user, password, api string, startAt, finishAt time.Time
 	l := len(c)
 	i := 0
 	for image, tag := range c {
-		fmt.Printf("Start replication %d/%d\n", i, l)
+		fmt.Printf("Replication %d/%d\n", i, l)
 		updateReplication(server, user, password, api, image, "{"+tag+"}", policyId, rp)
 		startReplication(server, user, password, api, policyId)
 		waitFinishReplication(server, user, password, api, image+":"+tag, policyId)
