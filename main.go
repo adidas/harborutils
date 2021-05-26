@@ -19,7 +19,7 @@ var harborUser, harborUserTarget string
 var harborPassword, harborPasswordTarget string
 var harborAPIVersion, harborAPIVersionTarget string
 var fromStringDate, untilStringDate string
-var replicationID int
+var replicationName string
 
 // database
 var dbHostSource, dbHostTarget string
@@ -306,7 +306,7 @@ var syncRegistriesCmd = &cobra.Command{
 		untilDate := t
 		harborAPIVersion = util.ApiVersion(harborAPIVersion)
 		fmt.Printf("%s, %s", fromDate, untilDate)
-		replication(harborServer, harborUser, harborPassword, harborAPIVersion, fromDate, untilDate, replicationID)
+		replication(harborServer, harborUser, harborPassword, harborAPIVersion, replicationName, fromDate, untilDate)
 	},
 }
 
@@ -395,10 +395,12 @@ func main() {
 	syncRobotAccountCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "", false, "verbose output, shows all sql operations")
 	syncRobotAccountCmd.MarkPersistentFlagRequired("")
 
-	syncRegistriesCmd.PersistentFlags().StringVarP(&harborAPIVersionTarget, "apiVersion2", "", "", "API Version Secondary Harbor (ie v2.0)")
 	syncRegistriesCmd.PersistentFlags().StringVarP(&fromStringDate, "fromDate", "", "", "Syncronitation from date specific date (RFC3339)")
+	syncRobotAccountCmd.MarkPersistentFlagRequired("fromDate")
 	syncRegistriesCmd.PersistentFlags().StringVarP(&untilStringDate, "untilDate", "", "", "Syncronitation until date specific date (RFC3339)")
-	syncRegistriesCmd.PersistentFlags().IntVarP(&replicationID, "replicationID", "", 0, "Replication Rule ID, the configuration of this replication will be used")
+	syncRobotAccountCmd.MarkPersistentFlagRequired("untilDate")
+	syncRegistriesCmd.PersistentFlags().StringVarP(&replicationName, "replicationName", "", "", "Replication Rule Name, the configuration of this replication will be used")
+	syncRobotAccountCmd.MarkPersistentFlagRequired("replicationName")
 
 	rootCmd.AddCommand(getProjectsGroupsCmd)
 	rootCmd.AddCommand(getGroupsCmd)

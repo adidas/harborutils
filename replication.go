@@ -37,6 +37,32 @@ func getReplicationPolicy(server, user, password, apiVersion string, policyId in
 	return rp
 }
 
+func getReplicationPolicyByName(server, user, password, apiVersion, policyName string) []ReplicationPolicy {
+	url := fmt.Sprintf("%v/api/%vreplication/policies?name=%v",
+		server,
+		apiVersion,
+		policyName,
+	)
+
+	var rp []ReplicationPolicy
+
+	res, body := client(
+		ClientPrt{
+			Url:         url,
+			Method:      "GET",
+			ContentType: "application/json",
+			User:        user,
+			Password:    password,
+		},
+	)
+	if res.StatusCode < 399 && res.StatusCode > 100 {
+		json.Unmarshal([]byte(body), &rp)
+	} else {
+		log.Printf("Error getting replication policy: %s, errorCode: %d\n", policyName, res.StatusCode)
+	}
+	return rp
+}
+
 func updateReplication(server, user, password, apiVersion, image, tag string, policyId int, rp ReplicationPolicy) {
 	// image := strings.Split(resource, ":")[0]
 	// tag := strings.Split(resource, ":")[1]
@@ -171,8 +197,22 @@ func compactReplication(server, user, password, api string, logs []AuditLog) map
 	return c
 }
 
-func replication(server, user, password, api string, startAt, finishAt time.Time, policyId int) {
-	rp := getReplicationPolicy(server, user, password, api, policyId)
+func replication(server, user, password, api, policyName string, startAt, finishAt time.Time) {
+	rps := getReplicationPolicyByName(server, user, password, api, policyName)
+	if len(rps) != 1 {
+		if len(rps) == 0 {
+			log.Fatalf("No policy found, policyName %s\n", policyName)
+		} else {
+			str := ""
+			for _, rp := range rps {
+				str = fmt.Sprintf("%s, %s", str, rp.Name)
+			}
+			log.Fatalf("Found multiple policies with the same name %s\n", str)
+		}
+		os.Exit(1)
+	}
+	rp := rps[0]
+	policyId := rps[0].ID
 	logs := listAuditLogs(server, user, password, api, startAt, finishAt)
 	c := compactReplication(server, user, password, api, logs)
 	l := len(c)
