@@ -34,7 +34,10 @@ func getArtifactSHA(server, user, password, apiVersion, project, image string) (
 		},
 	)
 	if res.StatusCode < 399 && res.StatusCode > 100 {
-		json.Unmarshal([]byte(body), &artifactResponse)
+		err := json.Unmarshal([]byte(body), &artifactResponse)
+		if err != nil {
+			return "", errors.New("There was an error getting the artifact")
+		}
 	} else {
 		log.Fatal("Error getting artifacts")
 		return "", errors.New("There was an error getting the artifact")
