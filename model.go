@@ -76,6 +76,10 @@ type LabelResponse struct {
 	Name         string `json:"name,omitempty"`
 }
 
+type ArtifactResponse struct {
+	Digest string `json:"digest,omitempty"`
+}
+
 type Metadata struct {
 	AutoScan           bool   `json:"auto_scan,omitempty"`
 	EnableContentTrust bool   `json:"enable_content_trust,omitempty"`

@@ -288,6 +288,52 @@ var syncUsersDbCmd = &cobra.Command{
 	},
 }
 
+var getShaCmd = &cobra.Command{
+	Use:   "getSha <project> <image>",
+	Short: "Get image digest from Harbor",
+	Long:  `Get image disgest from Harbor.`,
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+
+		harborPassword = promptForPassword(harborServer, harborPassword)
+		var image = args[1]
+		var project = args[0]
+		if harborAPIVersion != "" {
+			harborAPIVersion = harborAPIVersion + "/"
+		}
+		sha, err := getArtifactSHA(harborServer, harborUser, harborPassword, harborAPIVersion, project, image)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(sha)
+	},
+}
+
+var checkShaCmd = &cobra.Command{
+	Use:   "checkSha <project> <image> <digest>",
+	Short: "Check image digest against Harbor",
+	Long:  `Check image digest against Harbor.`,
+	Args:  cobra.ExactArgs(3),
+	Run: func(cmd *cobra.Command, args []string) {
+
+		harborPassword = promptForPassword(harborServer, harborPassword)
+		var image = args[1]
+		var project = args[0]
+		var digest = args[2]
+		if harborAPIVersion != "" {
+			harborAPIVersion = harborAPIVersion + "/"
+		}
+		equal := checkArtifactSHA(harborServer, harborUser, harborPassword, harborAPIVersion, project, image, digest)
+		if equal {
+			fmt.Println("Same digest in registry")
+			os.Exit(0)
+		}
+		fmt.Println("Image digest differs")
+		os.Exit(1)
+
+	},
+}
+
 func main() {
 	rootCmd.PersistentFlags().StringVarP(&harborServer, "harbor", "s", "", "Harbor Server address")
 	rootCmd.MarkPersistentFlagRequired("harbor")
@@ -385,6 +431,9 @@ func main() {
 
 	rootCmd.AddCommand(fixEmptyEmailsDbCmd)
 	rootCmd.AddCommand(syncUsersDbCmd)
+
+	rootCmd.AddCommand(getShaCmd)
+	rootCmd.AddCommand(checkShaCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
