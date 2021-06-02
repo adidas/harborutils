@@ -250,6 +250,19 @@ type ReplicationPolicy struct {
 	Name     string `json:"name"`
 }
 
+type ReplicationTask struct {
+	Status       string    `json:"status"`
+	JobID        string    `json:"job_id"`
+	StartTime    time.Time `json:"start_time"`
+	DstResource  string    `json:"dst_resource"`
+	SrcResource  string    `json:"src_resource"`
+	ResourceType string    `json:"resource_type"`
+	Operation    string    `json:"operation"`
+	ID           int       `json:"id"`
+	ExecutionID  int       `json:"execution_id"`
+	EndTime      time.Time `json:"end_time"`
+}
+
 // prefix Db, to reference database models
 
 type DbHarborUser struct {

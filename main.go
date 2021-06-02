@@ -351,6 +351,16 @@ var syncRegistriesCmd = &cobra.Command{
 	},
 }
 
+var getReplicationTaksCmd = &cobra.Command{
+	Use:   "replicationTaks",
+	Short: "returns the status of the last replications tasks (harbor stored the last 50)",
+	Long:  "returns the status of the last replications tasks (harbor stored the last 50)",
+	Run: func(cmd *cobra.Command, args []string) {
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
+		getReplicationTaksByPolicyName(harborServer, harborUser, harborPassword, harborAPIVersion, replicationName)
+	},
+}
+
 func main() {
 	rootCmd.PersistentFlags().StringVarP(&harborServer, "harbor", "s", "", "Harbor Server address")
 	rootCmd.MarkPersistentFlagRequired("harbor")
@@ -437,11 +447,11 @@ func main() {
 	syncRobotAccountCmd.MarkPersistentFlagRequired("")
 
 	syncRegistriesCmd.PersistentFlags().StringVarP(&fromStringDate, "fromDate", "", "", "Syncronitation from date specific date (RFC3339)")
-	syncRobotAccountCmd.MarkPersistentFlagRequired("fromDate")
+	syncRegistriesCmd.MarkPersistentFlagRequired("fromDate")
 	syncRegistriesCmd.PersistentFlags().StringVarP(&untilStringDate, "untilDate", "", "", "Syncronitation until date specific date (RFC3339)")
-	syncRobotAccountCmd.MarkPersistentFlagRequired("untilDate")
+	syncRegistriesCmd.MarkPersistentFlagRequired("untilDate")
 	syncRegistriesCmd.PersistentFlags().StringVarP(&replicationName, "replicationName", "", "", "Replication Rule Name, the configuration of this replication will be used")
-	syncRobotAccountCmd.MarkPersistentFlagRequired("replicationName")
+	syncRegistriesCmd.MarkPersistentFlagRequired("replicationName")
 
 	rootCmd.AddCommand(getProjectsGroupsCmd)
 	rootCmd.AddCommand(getGroupsCmd)
@@ -459,6 +469,10 @@ func main() {
 
 	rootCmd.AddCommand(getShaCmd)
 	rootCmd.AddCommand(checkShaCmd)
+
+	getReplicationTaksCmd.PersistentFlags().StringVarP(&replicationName, "replicationName", "", "", "Replication Rule Name, the configuration of this replication will be used")
+	getReplicationTaksCmd.MarkPersistentFlagRequired("replicationName")
+	rootCmd.AddCommand(getReplicationTaksCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
