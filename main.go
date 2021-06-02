@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"main/util"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
@@ -16,6 +18,8 @@ var harborServer, harborServerTarget string
 var harborUser, harborUserTarget string
 var harborPassword, harborPasswordTarget string
 var harborAPIVersion, harborAPIVersionTarget string
+var fromStringDate, untilStringDate string
+var replicationName string
 
 // database
 var dbHostSource, dbHostTarget string
@@ -251,16 +255,8 @@ var syncRobotAccountCmd = &cobra.Command{
 	Long:  "Propagate robot account from primary harbor to secondary",
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// robots := getRobots(harborServer, harborUser, harborPassword, harborAPIVersion)
-		// for _, robot := range robots {
-		// 	fmt.Printf("%+v", robot)
-		// }
-		if harborAPIVersion != "" {
-			harborAPIVersion = harborAPIVersion + "/"
-		}
-		if harborAPIVersionTarget != "" {
-			harborAPIVersionTarget = harborAPIVersionTarget + "/"
-		}
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
+		harborAPIVersionTarget = util.ApiVersion(harborAPIVersion)
 		syncRobots(harborServer, harborUser, harborPassword, harborAPIVersion, harborServerTarget, harborUserTarget, harborPasswordTarget, harborAPIVersionTarget,
 			clientDb(dbHostSource, dbUserSource, dbPasswordSource, dbPortSource, verbose),
 			clientDb(dbHostTarget, dbUserTarget, dbPasswordTarget, dbPortTarget, verbose))
@@ -298,9 +294,7 @@ var getShaCmd = &cobra.Command{
 		harborPassword = promptForPassword(harborServer, harborPassword)
 		var image = args[1]
 		var project = args[0]
-		if harborAPIVersion != "" {
-			harborAPIVersion = harborAPIVersion + "/"
-		}
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
 		sha, err := getArtifactSHA(harborServer, harborUser, harborPassword, harborAPIVersion, project, image)
 		if err != nil {
 			log.Fatal(err)
@@ -320,9 +314,7 @@ var checkShaCmd = &cobra.Command{
 		var image = args[1]
 		var project = args[0]
 		var digest = args[2]
-		if harborAPIVersion != "" {
-			harborAPIVersion = harborAPIVersion + "/"
-		}
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
 		equal := checkArtifactSHA(harborServer, harborUser, harborPassword, harborAPIVersion, project, image, digest)
 		if equal {
 			fmt.Println("Same digest in registry")
@@ -330,7 +322,32 @@ var checkShaCmd = &cobra.Command{
 		}
 		fmt.Println("Image digest differs")
 		os.Exit(1)
+	},
+}
 
+var syncRegistriesCmd = &cobra.Command{
+	Use:   "syncRegistries",
+	Short: "Syncs objects created between two dates from harbor primary to harbor secundary",
+	Long:  "Syncs objects created between two dates from harbor primary to harbor secundary",
+	Run: func(cmd *cobra.Command, args []string) {
+
+		t, err := time.Parse("2006-01-02T15:04:05Z", fromStringDate)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fromDate := t
+
+		// t, err = util.ParseRFC3339(untilStringDate, metav1.Now)
+		t, err = time.Parse("2006-01-02T15:04:05Z", untilStringDate)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		untilDate := t
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
+		fmt.Printf("%s, %s", fromDate, untilDate)
+		replication(harborServer, harborUser, harborPassword, harborAPIVersion, replicationName, fromDate, untilDate)
 	},
 }
 
@@ -419,6 +436,13 @@ func main() {
 	syncRobotAccountCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "", false, "verbose output, shows all sql operations")
 	syncRobotAccountCmd.MarkPersistentFlagRequired("")
 
+	syncRegistriesCmd.PersistentFlags().StringVarP(&fromStringDate, "fromDate", "", "", "Syncronitation from date specific date (RFC3339)")
+	syncRobotAccountCmd.MarkPersistentFlagRequired("fromDate")
+	syncRegistriesCmd.PersistentFlags().StringVarP(&untilStringDate, "untilDate", "", "", "Syncronitation until date specific date (RFC3339)")
+	syncRobotAccountCmd.MarkPersistentFlagRequired("untilDate")
+	syncRegistriesCmd.PersistentFlags().StringVarP(&replicationName, "replicationName", "", "", "Replication Rule Name, the configuration of this replication will be used")
+	syncRobotAccountCmd.MarkPersistentFlagRequired("replicationName")
+
 	rootCmd.AddCommand(getProjectsGroupsCmd)
 	rootCmd.AddCommand(getGroupsCmd)
 	rootCmd.AddCommand(deleteGroupsCmd)
@@ -431,6 +455,7 @@ func main() {
 
 	rootCmd.AddCommand(fixEmptyEmailsDbCmd)
 	rootCmd.AddCommand(syncUsersDbCmd)
+	rootCmd.AddCommand(syncRegistriesCmd)
 
 	rootCmd.AddCommand(getShaCmd)
 	rootCmd.AddCommand(checkShaCmd)

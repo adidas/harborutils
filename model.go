@@ -166,6 +166,90 @@ type RobotCreatedReponse struct {
 	Name         string    `json:"name"`
 }
 
+type AuditLog struct {
+	Username     string `json:"username"`
+	Resource     string `json:"resource"`
+	Operation    string `json:"operation"`
+	OpTime       string `json:"op_time"`
+	ID           int    `json:"id"`
+	ResourceType string `json:"resource_type"`
+}
+
+type ReplicationExecution struct {
+	Status     string    `json:"status"`
+	StatusText string    `json:"status_text"`
+	Trigger    string    `json:"trigger"`
+	StartTime  time.Time `json:"start_time"`
+	Failed     int       `json:"failed"`
+	Succeed    int       `json:"succeed"`
+	Stopped    int       `json:"stopped"`
+	EndTime    time.Time `json:"end_time"`
+	InProgress int       `json:"in_progress"`
+	Total      int       `json:"total"`
+	ID         int       `json:"id"`
+	PolicyID   int       `json:"policy_id"`
+}
+
+type StartReplicationExecution struct {
+	PolicyID int `json:"policy_id"`
+}
+
+type RPFilter struct {
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
+
+type ReplicationPolicy struct {
+	UpdateTime   string     `json:"update_time"`
+	Description  string     `json:"description"`
+	Enabled      bool       `json:"enabled"`
+	Filters      []RPFilter `json:"filters"`
+	DestRegistry struct {
+		Status     string `json:"status"`
+		Credential struct {
+			AccessKey    string `json:"access_key"`
+			AccessSecret string `json:"access_secret"`
+			Type         string `json:"type"`
+		} `json:"credential"`
+		UpdateTime   string `json:"update_time"`
+		Name         string `json:"name"`
+		URL          string `json:"url"`
+		Insecure     bool   `json:"insecure"`
+		CreationTime string `json:"creation_time"`
+		Type         string `json:"type"`
+		ID           int    `json:"id"`
+		Description  string `json:"description"`
+	} `json:"dest_registry"`
+	CreationTime string `json:"creation_time"`
+	SrcRegistry  struct {
+		Status     string `json:"status"`
+		Credential struct {
+			AccessKey    string `json:"access_key"`
+			AccessSecret string `json:"access_secret"`
+			Type         string `json:"type"`
+		} `json:"credential"`
+		UpdateTime   string `json:"update_time"`
+		Name         string `json:"name"`
+		URL          string `json:"url"`
+		Insecure     bool   `json:"insecure"`
+		CreationTime string `json:"creation_time"`
+		Type         string `json:"type"`
+		ID           int    `json:"id"`
+		Description  string `json:"description"`
+	} `json:"src_registry"`
+	DestNamespace string `json:"dest_namespace"`
+	Trigger       struct {
+		Type            string `json:"type"`
+		TriggerSettings struct {
+			Cron string `json:"cron"`
+		} `json:"trigger_settings"`
+	} `json:"trigger"`
+	Deletion bool   `json:"deletion"`
+	Override bool   `json:"override"`
+	ID       int    `json:"id"`
+	Name     string `json:"name"`
+}
+
 // prefix Db, to reference database models
 
 type DbHarborUser struct {
