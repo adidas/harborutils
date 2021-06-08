@@ -23,20 +23,24 @@ Usage
 -----
 
 ```
+Interacts with harbor registry API
+
 Usage:
   harborutils [command]
 
 Available Commands:
-  completion       generate the autocompletion script for the specified shell
+  checkSha         Check image digest against Harbor
   deleteGroups     Delete groups from Harbor
   fixEmptyEmails   Fix empty emails in database
   getGroups        Get groups from Harbor
   getProjects      Get projects from Harbor
+  getSha           Get image digest from Harbor
   help             Help about any command
   importLdapGroups Propagate groups from primary harbor to secondary
   importLdapUsers  Propagate users from primary harbor to secondary
   syncGrants       Propagate grants from primary harbor to secondary
   syncLabels       Propagate project labels from primary harbor to secondary
+  syncRegistries   Syncs objects created between two dates from harbor primary to harbor secundary
   syncRobotAccount Propagate robot account from primary harbor to secondary
   syncUsersDb      Sync users between harbor primary and harbor secondary
 
