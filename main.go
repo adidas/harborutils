@@ -25,6 +25,7 @@ var replicationName string
 var dbHostSource, dbHostTarget string
 var dbUserSource, dbUserTarget string
 var dbPasswordSource, dbPasswordTarget string
+var clientId, tenant string
 var dbPortSource, dbPortTarget int
 var verbose bool
 
@@ -295,7 +296,7 @@ var getShaCmd = &cobra.Command{
 		var image = args[1]
 		var project = args[0]
 		harborAPIVersion = util.ApiVersion(harborAPIVersion)
-		sha, err := getArtifactSHA(harborServer, harborUser, harborPassword, harborAPIVersion, project, image)
+		sha, err := getArtifactSHA(clientId, tenant, harborServer, harborUser, harborPassword, harborAPIVersion, project, image)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -315,7 +316,7 @@ var checkShaCmd = &cobra.Command{
 		var project = args[0]
 		var digest = args[2]
 		harborAPIVersion = util.ApiVersion(harborAPIVersion)
-		equal := checkArtifactSHA(harborServer, harborUser, harborPassword, harborAPIVersion, project, image, digest)
+		equal := checkArtifactSHA(clientId, tenant, harborServer, harborUser, harborPassword, harborAPIVersion, project, image, digest)
 		if equal {
 			fmt.Println("Same digest in registry")
 			os.Exit(0)
@@ -367,14 +368,14 @@ func main() {
 	rootCmd.PersistentFlags().StringVarP(&harborUser, "user", "u", "", "Username Harbor")
 	rootCmd.MarkPersistentFlagRequired("user")
 	rootCmd.PersistentFlags().StringVarP(&harborPassword, "password", "p", "", "Password")
-	rootCmd.PersistentFlags().StringVarP(&harborAPIVersion, "apiVersion", "v", "", "APIVersion (ie v2.0)")
+	rootCmd.PersistentFlags().StringVarP(&harborAPIVersion, "apiVersion", "v", "v2.0", "APIVersion (ie v2.0)")
 
 	syncGrantsCmd.PersistentFlags().StringVarP(&harborServerTarget, "harbor2", "", "", "Harbor Secondary Server address")
 	syncGrantsCmd.MarkPersistentFlagRequired("harbor2")
 	syncGrantsCmd.PersistentFlags().StringVarP(&harborUserTarget, "user2", "", "", "Username Secondary Harbor")
 	syncGrantsCmd.MarkPersistentFlagRequired("user2")
 	syncGrantsCmd.PersistentFlags().StringVarP(&harborPasswordTarget, "password2", "", "", "Password Secondary Harbor")
-	syncGrantsCmd.PersistentFlags().StringVarP(&harborAPIVersionTarget, "apiVersion2", "", "", "API Version Secondary Harbor (ie v2.0) ")
+	syncGrantsCmd.PersistentFlags().StringVarP(&harborAPIVersionTarget, "apiVersion2", "", "v2.0", "API Version Secondary Harbor (ie v2.0) ")
 
 	syncLabelsCmd.PersistentFlags().StringVarP(&harborServerTarget, "harbor2", "", "", "Harbor Secondary Server address")
 	syncLabelsCmd.MarkPersistentFlagRequired("harbor2")
@@ -452,6 +453,16 @@ func main() {
 	syncRegistriesCmd.MarkPersistentFlagRequired("untilDate")
 	syncRegistriesCmd.PersistentFlags().StringVarP(&replicationName, "replicationName", "", "", "Replication Rule Name, the configuration of this replication will be used")
 	syncRegistriesCmd.MarkPersistentFlagRequired("replicationName")
+
+	getShaCmd.PersistentFlags().StringVarP(&clientId, "oidcClient", "", "", "Oidc client id for authentication")
+	getShaCmd.MarkPersistentFlagRequired("oidcClient")
+	getShaCmd.PersistentFlags().StringVarP(&tenant, "tenant", "", "", "Azure tenant for oidc authentication")
+	getShaCmd.MarkPersistentFlagRequired("tenant")
+
+	checkShaCmd.PersistentFlags().StringVarP(&clientId, "oidcClient", "", "", "Oidc client id for authentication")
+	checkShaCmd.MarkPersistentFlagRequired("oidcClient")
+	checkShaCmd.PersistentFlags().StringVarP(&tenant, "tenant", "", "", "Azure tenant for oidc authentication")
+	checkShaCmd.MarkPersistentFlagRequired("tenant")
 
 	rootCmd.AddCommand(getProjectsGroupsCmd)
 	rootCmd.AddCommand(getGroupsCmd)
