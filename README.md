@@ -38,6 +38,8 @@ Available Commands:
   help             Help about any command
   importLdapGroups Propagate groups from primary harbor to secondary
   importLdapUsers  Propagate users from primary harbor to secondary
+  replicationTaks  returns the status of the last replications tasks (harbor stored the last 50)
+  server           Run a server exposing some options of the cli
   syncGrants       Propagate grants from primary harbor to secondary
   syncLabels       Propagate project labels from primary harbor to secondary
   syncRegistries   Syncs objects created between two dates from harbor primary to harbor secundary
@@ -45,7 +47,7 @@ Available Commands:
   syncUsersDb      Sync users between harbor primary and harbor secondary
 
 Flags:
-  -v, --apiVersion string   APIVersion (ie v2.0)
+  -v, --apiVersion string   APIVersion (ie v2.0) (default "v2.0")
   -s, --harbor string       Harbor Server address
   -h, --help                help for harborutils
   -p, --password string     Password
@@ -53,9 +55,25 @@ Flags:
 
 Use "harborutils [command] --help" for more information about a command.
 ```
-  
+
+Update swagger documentation
+----------------------------
+```
+$ cd server
+$ swag  init -g root.go 
+2021/06/15 20:13:47 Generate swagger docs....
+2021/06/15 20:13:47 Generate general API Info, search dir:./
+2021/06/15 20:13:47 Generating server.Token
+2021/06/15 20:13:47 Generating server.APIError
+2021/06/15 20:13:47 Generating server.ArtifactSha
+2021/06/15 20:13:47 Generating server.ArtifactCheckSha
+2021/06/15 20:13:47 create docs.go at docs/docs.go
+2021/06/15 20:13:47 create swagger.json at docs/swagger.json
+2021/06/15 20:13:47 create swagger.yaml at docs/swagger.yaml
+```
 
 Releases
 --------
 
 * 1.0.0 - First version
+* 1.1.0 - Add server

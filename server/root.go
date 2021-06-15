@@ -7,7 +7,11 @@ import (
 	"net/http"
 	"strings"
 
+	_ "main/server/docs"
+
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type ServerConfig struct {
@@ -47,6 +51,17 @@ type ParamsGetArtifactSha struct {
 	Name string `uri:"name" binding:"required"`
 }
 
+//
+// @Summary Get Bearer to use harborUtils or Harbor Api
+// @Description get Bearer, using https://github.com/goharbor/harbor/issues/13683#issuecomment-739036574
+// @Accept  json
+// @Produce  json
+// @Param   client_id     query    string     false        "Oidc client id for authentication"
+// @Param   tenant_id     query    string     false        "Azure tenant for oidc authentication"
+// @Security BasicAuth
+// @Success 200 {object} server.Token	"Success"
+// @Failure 400 {object} server.APIError "Bad request"
+// @Router /jwt [get]
 func getToken(c *gin.Context) {
 	username, password := "", ""
 	credentials := c.Request.Header["Authorization"]
@@ -67,12 +82,24 @@ func getToken(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(200, gin.H{
-		"msg":   token,
-		"creds": credentials,
-	})
+	c.JSON(200, Token{Token: token})
+
+	// 	c.JSON(200, gin.H{
+	// 		"token": token,
+	// 	})
 }
 
+//
+// @Summary Get image digest from Harbor
+// @Description get image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}
+// @Accept  json
+// @Produce  json
+// @Param   host     query    string     false        "Harbor url"
+// @Param   image     query    string     true        "image name"
+// @Param   Token     header    string     true        "Bearer to use harbor api"
+// @Success 200 {object} server.ArtifactSha	"Success"
+// @Failure 400 {object} server.APIError "Bad request"
+// @Router /artifact/sha [get]
 func getArtifactSHA(c *gin.Context) {
 	var token []string
 	host := c.DefaultQuery("host", serverConfig.Host)
@@ -108,6 +135,18 @@ func getArtifactSHA(c *gin.Context) {
 	})
 }
 
+//
+// @Summary Check image digest from Harbor
+// @Description Check image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}
+// @Accept  json
+// @Produce  json
+// @Param   host     query    string     false        "Harbor url"
+// @Param   image     query    string     true        "image name"
+// @Param   targetDigest     query    string     true        "sha digest"
+// @Param   Token     header    string     true        "Bearer to use harbor api"
+// @Success 200 {object} server.ArtifactCheckSha	"Success"
+// @Failure 400 {object} server.APIError "Bad request"
+// @Router /artifact/check_sha [get]
 func checkArtifactSHA(c *gin.Context) {
 	var token []string
 
@@ -158,6 +197,11 @@ func health(c *gin.Context) {
 	})
 }
 
+// @title HarborUtils API
+// @version 1.0
+// @description These APIs provide services for using HarborUtiuls.
+// @contact.url https://*****/confluence/spaces/viewspace.action?key=CICDTOOLS
+// @securityDefinitions.basic BasicAuth
 func Execute(config ServerConfig) {
 	serverConfig = config
 	route := gin.Default()
@@ -165,5 +209,8 @@ func Execute(config ServerConfig) {
 	route.GET("/artifact/sha", getArtifactSHA)
 	route.GET("/artifact/check_sha", checkArtifactSHA)
 	route.GET("/health", health)
+
+	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
+	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	route.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
