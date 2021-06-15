@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"main/client"
+	"net/http"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -151,11 +152,18 @@ func checkArtifactSHA(c *gin.Context) {
 	})
 }
 
+func health(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"status": "healthy",
+	})
+}
+
 func Execute(config ServerConfig) {
 	serverConfig = config
 	route := gin.Default()
 	route.GET("/jwt", getToken)
 	route.GET("/artifact/sha", getArtifactSHA)
 	route.GET("/artifact/check_sha", checkArtifactSHA)
+	route.GET("/health", health)
 	route.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
