@@ -18,7 +18,7 @@ type ServerConfig struct {
 	ClientId   string `json:"-"`
 	TenantId   string `json:"-"`
 	Host       string `json:"host" example:"sha256:https://registry.com"`
-	ApiVersion string `json:"api_version`
+	ApiVersion string `json:"api_version  example:"v2.0/`
 }
 
 var serverConfig ServerConfig
@@ -102,7 +102,8 @@ func getCredentials(c *gin.Context) (string, string, string, error) {
 // @Produce  json
 // @Param   host     query    string     false        "Harbor url"
 // @Param   image     query    string     true        "image name"
-// @Param   Token     header    string     true        "Bearer to use harbor api"
+// @Security BasicAuth
+// @Security ApiKeyAuth
 // @Success 200 {object} server.ArtifactSha	"Success"
 // @Failure 400 {object} server.APIError "Bad request"
 // @Router /artifact/sha [get]
@@ -137,7 +138,8 @@ func getArtifactSHA(c *gin.Context) {
 // @Param   host     query    string     false        "Harbor url"
 // @Param   image     query    string     true        "image name"
 // @Param   targetDigest     query    string     true        "sha digest"
-// @Param   Token     header    string     true        "Bearer to use harbor api"
+// @Security BasicAuth
+// @Security ApiKeyAuth
 // @Success 200 {object} server.ArtifactCheckSha	"Success"
 // @Failure 400 {object} server.APIError "Bad request"
 // @Router /artifact/check_sha [get]
@@ -201,6 +203,9 @@ func config(c *gin.Context) {
 // @description These APIs provide services for using HarborUtiuls.
 // @contact.url https://*****/confluence/spaces/viewspace.action?key=CICDTOOLS
 // @securityDefinitions.basic BasicAuth
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Token
 func Execute(c ServerConfig) {
 	serverConfig = c
 	route := gin.Default()

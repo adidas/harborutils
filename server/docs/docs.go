@@ -28,6 +28,14 @@ var doc = `{
     "paths": {
         "/artifact/check_sha": {
             "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    },
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Check image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}",
                 "consumes": [
                     "application/json"
@@ -56,13 +64,6 @@ var doc = `{
                         "name": "targetDigest",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer to use harbor api",
-                        "name": "Token",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -83,6 +84,14 @@ var doc = `{
         },
         "/artifact/sha": {
             "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    },
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}",
                 "consumes": [
                     "application/json"
@@ -104,13 +113,6 @@ var doc = `{
                         "name": "image",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Bearer to use harbor api",
-                        "name": "Token",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -124,6 +126,23 @@ var doc = `{
                         "description": "Bad request",
                         "schema": {
                             "$ref": "#/definitions/server.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/config": {
+            "get": {
+                "description": "The endpoint returns the Api Config.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "API Config",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.ServerConfig"
                         }
                     }
                 }
@@ -252,6 +271,18 @@ var doc = `{
                 }
             }
         },
+        "server.ServerConfig": {
+            "type": "object",
+            "properties": {
+                "api_version  example:": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string",
+                    "example": "sha256:https://registry.com"
+                }
+            }
+        },
         "server.Token": {
             "type": "object",
             "properties": {
@@ -263,6 +294,11 @@ var doc = `{
         }
     },
     "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Token",
+            "in": "header"
+        },
         "BasicAuth": {
             "type": "basic"
         }

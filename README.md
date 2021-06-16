@@ -72,6 +72,44 @@ $ swag  init -g root.go
 2021/06/15 20:13:47 create swagger.yaml at docs/swagger.yaml
 ```
 
+Server Usage
+------------
+Api documentation in: http://localhost:8080/swagger/index.html
+
+Examples written in [Httpie|https://httpie.io/]
+### Get token
+
+```
+http -a "MyAzureUser:MyPasswordUser"  "http://localhost:8080/jwt"
+```
+### Get Image SHA
+
+```
+http "http://localhost:8080/artifact/sha"  image=="pea-cicd/test/debian:stable-20200607-slim" -a "MyAzureUser:MyPasswordUser"
+http "http://localhost:8080/artifact/sha"  Token:MyToken image=="pea-cicd/test/debian:stable-20200607-slim"
+```
+
+### Check Image SHA
+
+```
+http "http://localhost:8080/artifact/check_sha"  image=="pea-cicd/test/debian:stable-20200607-slim" targetDigest==sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5 -a "MyAzureUser:MyPasswordUser"
+http "http://localhost:8080/artifact/check_sha"  Token:MyToken image=="pea-cicd/test/debian:stable-20200607-slim" targetDigest==sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5
+```
+
+
+### Get Config
+
+```
+http "http://localhost:8080/config"
+```
+
+### Get Health
+
+```
+http "http://localhost:8080/health"
+```
+
+
 Releases
 --------
 

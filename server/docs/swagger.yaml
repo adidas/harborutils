@@ -40,6 +40,14 @@ definitions:
         example: healthy
         type: string
     type: object
+  server.ServerConfig:
+    properties:
+      'api_version  example:':
+        type: string
+      host:
+        example: sha256:https://registry.com
+        type: string
+    type: object
   server.Token:
     properties:
       token:
@@ -73,11 +81,6 @@ paths:
         name: targetDigest
         required: true
         type: string
-      - description: Bearer to use harbor api
-        in: header
-        name: Token
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -89,6 +92,9 @@ paths:
           description: Bad request
           schema:
             $ref: '#/definitions/server.APIError'
+      security:
+      - BasicAuth: []
+      - ApiKeyAuth: []
       summary: Check image digest from Harbor
   /artifact/sha:
     get:
@@ -105,11 +111,6 @@ paths:
         name: image
         required: true
         type: string
-      - description: Bearer to use harbor api
-        in: header
-        name: Token
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -121,7 +122,21 @@ paths:
           description: Bad request
           schema:
             $ref: '#/definitions/server.APIError'
+      security:
+      - BasicAuth: []
+      - ApiKeyAuth: []
       summary: Get image digest from Harbor
+  /config:
+    get:
+      description: The endpoint returns the Api Config.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.ServerConfig'
+      summary: API Config
   /health:
     get:
       description: The endpoint returns the health stauts of the system.
@@ -162,6 +177,10 @@ paths:
       - BasicAuth: []
       summary: Get Bearer to use harborUtils or Harbor Api
 securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Token
+    type: apiKey
   BasicAuth:
     type: basic
 swagger: "2.0"
