@@ -15,9 +15,10 @@ import (
 )
 
 type ServerConfig struct {
-	ClientId string `json:"-"`
-	TenantId string `json:"-"`
-	Host     string `json:"host" example:"sha256:https://registry.com"`
+	ClientId   string `json:"-"`
+	TenantId   string `json:"-"`
+	Host       string `json:"host" example:"sha256:https://registry.com"`
+	ApiVersion string `json:"api_version`
 }
 
 var serverConfig ServerConfig
@@ -120,7 +121,7 @@ func getArtifactSHA(c *gin.Context) {
 		return
 	}
 
-	sha, err := client.GetArtifactSHA(host, "v2.0/", token, username, password, project, image)
+	sha, err := client.GetArtifactSHA(host, serverConfig.ApiVersion, token, username, password, project, image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
@@ -155,7 +156,7 @@ func checkArtifactSHA(c *gin.Context) {
 	targetDigest := c.DefaultQuery("targetDigest", "")
 
 	host := c.DefaultQuery("host", serverConfig.Host)
-	sha, err := client.GetArtifactSHA(host, "v2.0/", token, username, password, project, image)
+	sha, err := client.GetArtifactSHA(host, serverConfig.ApiVersion, token, username, password, project, image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return

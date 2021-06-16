@@ -2,6 +2,7 @@ package main
 
 import (
 	"main/server"
+	"main/util"
 
 	"github.com/spf13/cobra"
 )
@@ -12,10 +13,12 @@ var serverCmd = &cobra.Command{
 	Short: "Run a server exposing some options of the cli",
 	Long:  `Run a server exposing some options of the cli, more info in http://localhost:8080/swagger/index.html`,
 	Run: func(cmd *cobra.Command, args []string) {
+		harborAPIVersion = util.ApiVersion(harborAPIVersion)
 		server.Execute(server.ServerConfig{
-			ClientId: clientId,
-			TenantId: tenant,
-			Host:     harborServer,
+			ClientId:   clientId,
+			TenantId:   tenant,
+			Host:       harborServer,
+			ApiVersion: harborAPIVersion,
 		})
 	},
 }
@@ -25,6 +28,8 @@ func init() {
 	serverCmd.MarkPersistentFlagRequired("oidcClient")
 	serverCmd.PersistentFlags().StringVarP(&tenant, "tenant", "", "", "Azure tenant for oidc authentication")
 	serverCmd.MarkPersistentFlagRequired("tenant")
+	serverCmd.PersistentFlags().StringVarP(&harborAPIVersion, "apiVersion", "v", "v2.0", "APIVersion (ie v2.0)")
+
 	rootCmd.AddCommand(serverCmd)
 
 	// Here you will define your flags and configuration settings.
