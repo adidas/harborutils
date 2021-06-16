@@ -77,16 +77,10 @@ func getToken(c *gin.Context) {
 	tenant := c.DefaultQuery("tenant_id", serverConfig.TenantId)
 	token, err := client.GetOidcBearer(clientId, tenant, "", username, password)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"msg": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
 	}
-	c.JSON(200, Token{Token: token})
-
-	// 	c.JSON(200, gin.H{
-	// 		"token": token,
-	// 	})
+	c.JSON(http.StatusAccepted, Token{Token: token})
 }
 
 //
@@ -105,7 +99,7 @@ func getArtifactSHA(c *gin.Context) {
 	host := c.DefaultQuery("host", serverConfig.Host)
 
 	if token = c.Request.Header["Token"]; token == nil {
-		c.JSON(400, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"msg": "no Token header",
 		})
 		return
@@ -114,25 +108,16 @@ func getArtifactSHA(c *gin.Context) {
 	aux := c.DefaultQuery("image", "")
 	project, image, err := splitImage(aux)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"msg": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
 	}
 
 	sha, err := client.GetArtifactSHA(host, "v2.0/", token[0], project, image)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"msg": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
 	}
-
-	c.JSON(200, gin.H{
-		"image":   image,
-		"project": project,
-		"sha":     sha,
-	})
+	c.JSON(http.StatusAccepted, ArtifactSha{Image: image, Project: project, Sha: sha})
 }
 
 //
@@ -151,18 +136,14 @@ func checkArtifactSHA(c *gin.Context) {
 	var token []string
 
 	if token = c.Request.Header["Token"]; token == nil {
-		c.JSON(400, gin.H{
-			"msg": "no Token header",
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: "no Token header"})
 		return
 	}
 
 	aux := c.DefaultQuery("image", "")
 	project, image, err := splitImage(aux)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"msg": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
 	}
 
@@ -171,15 +152,13 @@ func checkArtifactSHA(c *gin.Context) {
 	host := c.DefaultQuery("host", serverConfig.Host)
 	sha, err := client.GetArtifactSHA(host, "v2.0/", token[0], project, image)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"msg": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
 	}
 	equals := strings.EqualFold(targetDigest, sha)
-	code := 200
+	code := http.StatusAccepted
 	if !equals {
-		code = 400
+		code = http.StatusBadRequest
 	}
 
 	c.JSON(code, gin.H{
@@ -198,9 +177,7 @@ func checkArtifactSHA(c *gin.Context) {
 // @Success 200 {object} server.HealthStatus	"Success"
 // @Router /health [get]
 func health(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": "healthy",
-	})
+	c.JSON(http.StatusOK, HealthStatus{Status: "healthy"})
 }
 
 // @title HarborUtils API
