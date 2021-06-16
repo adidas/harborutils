@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func GetArtifactSHA(server, apiVersion, idtoken, project, image string) (string, error) {
+func GetArtifactSHA(server, apiVersion, idtoken, user, password, project, image string) (string, error) {
 	artifact := strings.Split(image, ":")
 	if len(artifact) < 2 {
 		artifact = append(artifact, "latest")
@@ -33,6 +33,8 @@ func GetArtifactSHA(server, apiVersion, idtoken, project, image string) (string,
 			Method:      "GET",
 			ContentType: "application/json",
 			Bearer:      bearer,
+			User:        user,
+			Password:    password,
 		},
 	)
 	if res.StatusCode < 399 && res.StatusCode > 100 {
@@ -49,10 +51,10 @@ func GetArtifactSHA(server, apiVersion, idtoken, project, image string) (string,
 
 }
 
-func CheckArtifactSHA(server, apiVersion, idtoken, project, image, sha string) bool {
+func CheckArtifactSHA(server, apiVersion, idtoken, user, password, project, image, sha string) bool {
 
 	// artifact, e := GetArtifactSHA(server, apiVersion, idtoken, project, image)
-	artifact, e := GetArtifactSHA(server, apiVersion, idtoken, project, image)
+	artifact, e := GetArtifactSHA(server, apiVersion, idtoken, user, password, project, image)
 
 	if e != nil {
 		return false

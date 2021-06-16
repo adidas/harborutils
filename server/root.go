@@ -15,9 +15,9 @@ import (
 )
 
 type ServerConfig struct {
-	ClientId string
-	TenantId string
-	Host     string
+	ClientId string `json:"-"`
+	TenantId string `json:"-"`
+	Host     string `json:"host" example:"sha256:https://registry.com"`
 }
 
 var serverConfig ServerConfig
@@ -44,11 +44,6 @@ func splitImage(image string) (string, string, error) {
 		return "", "", errors.New("No proyect or artifact")
 	}
 	return aux[0], aux[1], nil
-
-}
-
-type ParamsGetArtifactSha struct {
-	Name string `uri:"name" binding:"required"`
 }
 
 //
@@ -66,9 +61,7 @@ func getToken(c *gin.Context) {
 	username, password := "", ""
 	credentials := c.Request.Header["Authorization"]
 	if credentials == nil {
-		c.JSON(400, gin.H{
-			"msg": "no Authorization header",
-		})
+		c.JSON(http.StatusBadRequest, APIError{Msg: "No Authorization header"})
 		return
 	}
 	username, password = basicAuth(credentials[0])
@@ -83,6 +76,24 @@ func getToken(c *gin.Context) {
 	c.JSON(http.StatusAccepted, Token{Token: token})
 }
 
+// if token, return token, if credentials, try to get token, and return token username and password
+func getCredentials(c *gin.Context) (string, string, string, error) {
+	credentials := c.Request.Header["Authorization"]
+	tokenHeader := c.Request.Header["Token"]
+	if credentials == nil && tokenHeader == nil {
+		return "", "", "", errors.New("Token or Authorization header found")
+	}
+	if tokenHeader != nil {
+		return "", "", tokenHeader[0], nil
+	}
+	var username, password string
+	if credentials != nil {
+		username, password = basicAuth(credentials[0])
+	}
+	token, _ := client.GetOidcBearer(serverConfig.ClientId, serverConfig.TenantId, "", username, password)
+	return username, password, token, nil
+}
+
 //
 // @Summary Get image digest from Harbor
 // @Description get image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}
@@ -95,14 +106,11 @@ func getToken(c *gin.Context) {
 // @Failure 400 {object} server.APIError "Bad request"
 // @Router /artifact/sha [get]
 func getArtifactSHA(c *gin.Context) {
-	var token []string
 	host := c.DefaultQuery("host", serverConfig.Host)
 
-	if token = c.Request.Header["Token"]; token == nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"msg": "no Token header",
-		})
-		return
+	username, password, token, err := getCredentials(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 	}
 
 	aux := c.DefaultQuery("image", "")
@@ -112,7 +120,7 @@ func getArtifactSHA(c *gin.Context) {
 		return
 	}
 
-	sha, err := client.GetArtifactSHA(host, "v2.0/", token[0], project, image)
+	sha, err := client.GetArtifactSHA(host, "v2.0/", token, username, password, project, image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
@@ -133,13 +141,10 @@ func getArtifactSHA(c *gin.Context) {
 // @Failure 400 {object} server.APIError "Bad request"
 // @Router /artifact/check_sha [get]
 func checkArtifactSHA(c *gin.Context) {
-	var token []string
-
-	if token = c.Request.Header["Token"]; token == nil {
-		c.JSON(http.StatusBadRequest, APIError{Msg: "no Token header"})
-		return
+	username, password, token, err := getCredentials(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 	}
-
 	aux := c.DefaultQuery("image", "")
 	project, image, err := splitImage(aux)
 	if err != nil {
@@ -150,7 +155,7 @@ func checkArtifactSHA(c *gin.Context) {
 	targetDigest := c.DefaultQuery("targetDigest", "")
 
 	host := c.DefaultQuery("host", serverConfig.Host)
-	sha, err := client.GetArtifactSHA(host, "v2.0/", token[0], project, image)
+	sha, err := client.GetArtifactSHA(host, "v2.0/", token, username, password, project, image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, APIError{Msg: err.Error()})
 		return
@@ -180,18 +185,29 @@ func health(c *gin.Context) {
 	c.JSON(http.StatusOK, HealthStatus{Status: "healthy"})
 }
 
+//
+// @Summary API Config
+// @Description The endpoint returns the Api Config.
+// @Produce  json
+// @Success 200 {object} server.ServerConfig	"Success"
+// @Router /config [get]
+func config(c *gin.Context) {
+	c.JSON(http.StatusOK, serverConfig)
+}
+
 // @title HarborUtils API
 // @version 1.0
 // @description These APIs provide services for using HarborUtiuls.
 // @contact.url https://*****/confluence/spaces/viewspace.action?key=CICDTOOLS
 // @securityDefinitions.basic BasicAuth
-func Execute(config ServerConfig) {
-	serverConfig = config
+func Execute(c ServerConfig) {
+	serverConfig = c
 	route := gin.Default()
 	route.GET("/jwt", getToken)
 	route.GET("/artifact/sha", getArtifactSHA)
 	route.GET("/artifact/check_sha", checkArtifactSHA)
 	route.GET("/health", health)
+	route.GET("/config", config)
 
 	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json") // The url pointing to API definition
 	route.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
