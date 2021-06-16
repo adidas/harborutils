@@ -34,6 +34,12 @@ definitions:
         example: sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5
         type: string
     type: object
+  server.HealthStatus:
+    properties:
+      status:
+        example: healthy
+        type: string
+    type: object
   server.Token:
     properties:
       token:
@@ -116,6 +122,17 @@ paths:
           schema:
             $ref: '#/definitions/server.APIError'
       summary: Get image digest from Harbor
+  /health:
+    get:
+      description: The endpoint returns the health stauts of the system.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.HealthStatus'
+      summary: Health check API
   /jwt:
     get:
       consumes:

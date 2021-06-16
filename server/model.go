@@ -20,3 +20,7 @@ type ArtifactCheckSha struct {
 	TargetDigset string `json:"targetDigset" example:"sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5"`
 	Equals       bool   `json:"equals" example:"true"`
 }
+
+type HealthStatus struct {
+	Status string `json:"status" example:"healthy"`
+}

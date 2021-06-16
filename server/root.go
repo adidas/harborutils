@@ -191,6 +191,12 @@ func checkArtifactSHA(c *gin.Context) {
 	})
 }
 
+//
+// @Summary Health check API
+// @Description The endpoint returns the health stauts of the system.
+// @Produce  json
+// @Success 200 {object} server.HealthStatus	"Success"
+// @Router /health [get]
 func health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status": "healthy",

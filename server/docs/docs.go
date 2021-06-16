@@ -129,6 +129,23 @@ var doc = `{
                 }
             }
         },
+        "/health": {
+            "get": {
+                "description": "The endpoint returns the health stauts of the system.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Health check API",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.HealthStatus"
+                        }
+                    }
+                }
+            }
+        },
         "/jwt": {
             "get": {
                 "security": [
@@ -223,6 +240,15 @@ var doc = `{
                 "sha": {
                     "type": "string",
                     "example": "sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5"
+                }
+            }
+        },
+        "server.HealthStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "healthy"
                 }
             }
         },
