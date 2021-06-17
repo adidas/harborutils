@@ -13,6 +13,9 @@ func getArtifactSHA(clientId, tenant, server, user, password, apiVersion, projec
 	if len(artifact) < 2 {
 		artifact = append(artifact, "latest")
 	}
+	// artifact[0] = url.QueryEscape(artifact[0])
+	artifact[0] = strings.ReplaceAll(artifact[0], "/", "%252F")
+
 	idtoken, err := getOidcBearer(clientId, tenant, server, user, password)
 
 	if err != nil {

@@ -1,0 +1,289 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "These APIs provide services for using HarborUtiuls.",
+        "title": "HarborUtils API",
+        "contact": {
+            "url": "https://*****/confluence/spaces/viewspace.action?key=CICDTOOLS"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/artifact/check_sha": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    },
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Check image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Check image digest from Harbor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Harbor url",
+                        "name": "host",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "image name",
+                        "name": "image",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "sha digest",
+                        "name": "targetDigest",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.ArtifactCheckSha"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/server.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/artifact/sha": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    },
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get image digest from Harbor",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Harbor url",
+                        "name": "host",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "image name",
+                        "name": "image",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.ArtifactSha"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/server.APIError"
+                        }
+                    }
+                }
+            }
+        },
+        "/config": {
+            "get": {
+                "description": "The endpoint returns the Api Config.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "API Config",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.ServerConfig"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "The endpoint returns the health stauts of the system.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Health check API",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.HealthStatus"
+                        }
+                    }
+                }
+            }
+        },
+        "/jwt": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "get Bearer, using https://github.com/goharbor/harbor/issues/13683#issuecomment-739036574",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get Bearer to use harborUtils or Harbor Api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Oidc client id for authentication",
+                        "name": "client_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Azure tenant for oidc authentication",
+                        "name": "tenant_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/server.Token"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/server.APIError"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "server.APIError": {
+            "type": "object",
+            "properties": {
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "server.ArtifactCheckSha": {
+            "type": "object",
+            "properties": {
+                "equals": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "image": {
+                    "type": "string",
+                    "example": "ngnix:latest"
+                },
+                "project": {
+                    "type": "string",
+                    "example": "pea-cicd"
+                },
+                "sha": {
+                    "type": "string",
+                    "example": "sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5"
+                },
+                "targetDigset": {
+                    "type": "string",
+                    "example": "sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5"
+                }
+            }
+        },
+        "server.ArtifactSha": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "string",
+                    "example": "ngnix:latest"
+                },
+                "project": {
+                    "type": "string",
+                    "example": "pea-cicd"
+                },
+                "sha": {
+                    "type": "string",
+                    "example": "sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5"
+                }
+            }
+        },
+        "server.HealthStatus": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "healthy"
+                }
+            }
+        },
+        "server.ServerConfig": {
+            "type": "object",
+            "properties": {
+                "api_version  example:": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string",
+                    "example": "sha256:https://registry.com"
+                }
+            }
+        },
+        "server.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string",
+                    "example": "123.456.789"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Token",
+            "in": "header"
+        },
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}

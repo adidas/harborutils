@@ -38,6 +38,8 @@ Available Commands:
   help             Help about any command
   importLdapGroups Propagate groups from primary harbor to secondary
   importLdapUsers  Propagate users from primary harbor to secondary
+  replicationTaks  returns the status of the last replications tasks (harbor stored the last 50)
+  server           Run a server exposing some options of the cli
   syncGrants       Propagate grants from primary harbor to secondary
   syncLabels       Propagate project labels from primary harbor to secondary
   syncRegistries   Syncs objects created between two dates from harbor primary to harbor secundary
@@ -45,7 +47,7 @@ Available Commands:
   syncUsersDb      Sync users between harbor primary and harbor secondary
 
 Flags:
-  -v, --apiVersion string   APIVersion (ie v2.0)
+  -v, --apiVersion string   APIVersion (ie v2.0) (default "v2.0")
   -s, --harbor string       Harbor Server address
   -h, --help                help for harborutils
   -p, --password string     Password
@@ -53,9 +55,63 @@ Flags:
 
 Use "harborutils [command] --help" for more information about a command.
 ```
-  
+
+Update swagger documentation
+----------------------------
+```
+$ cd server
+$ swag  init -g root.go 
+2021/06/15 20:13:47 Generate swagger docs....
+2021/06/15 20:13:47 Generate general API Info, search dir:./
+2021/06/15 20:13:47 Generating server.Token
+2021/06/15 20:13:47 Generating server.APIError
+2021/06/15 20:13:47 Generating server.ArtifactSha
+2021/06/15 20:13:47 Generating server.ArtifactCheckSha
+2021/06/15 20:13:47 create docs.go at docs/docs.go
+2021/06/15 20:13:47 create swagger.json at docs/swagger.json
+2021/06/15 20:13:47 create swagger.yaml at docs/swagger.yaml
+```
+
+Server Usage
+------------
+Api documentation in: http://localhost:8080/swagger/index.html
+
+Examples written in [Httpie|https://httpie.io/]
+### Get token
+
+```
+http -a "MyAzureUser:MyPasswordUser"  "http://localhost:8080/jwt"
+```
+### Get Image SHA
+
+```
+http "http://localhost:8080/artifact/sha"  image=="pea-cicd/test/debian:stable-20200607-slim" -a "MyAzureUser:MyPasswordUser"
+http "http://localhost:8080/artifact/sha"  Token:MyToken image=="pea-cicd/test/debian:stable-20200607-slim"
+```
+
+### Check Image SHA
+
+```
+http "http://localhost:8080/artifact/check_sha"  image=="pea-cicd/test/debian:stable-20200607-slim" targetDigest==sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5 -a "MyAzureUser:MyPasswordUser"
+http "http://localhost:8080/artifact/check_sha"  Token:MyToken image=="pea-cicd/test/debian:stable-20200607-slim" targetDigest==sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5
+```
+
+
+### Get Config
+
+```
+http "http://localhost:8080/config"
+```
+
+### Get Health
+
+```
+http "http://localhost:8080/health"
+```
+
 
 Releases
 --------
 
 * 1.0.0 - First version
+* 1.1.0 - Add server

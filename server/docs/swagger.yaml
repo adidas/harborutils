@@ -1,0 +1,186 @@
+definitions:
+  server.APIError:
+    properties:
+      msg:
+        type: string
+    type: object
+  server.ArtifactCheckSha:
+    properties:
+      equals:
+        example: true
+        type: boolean
+      image:
+        example: ngnix:latest
+        type: string
+      project:
+        example: pea-cicd
+        type: string
+      sha:
+        example: sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5
+        type: string
+      targetDigset:
+        example: sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5
+        type: string
+    type: object
+  server.ArtifactSha:
+    properties:
+      image:
+        example: ngnix:latest
+        type: string
+      project:
+        example: pea-cicd
+        type: string
+      sha:
+        example: sha256:a1c2d5c775a3b7ebc7af29c77241819a86cd1222b1931d0712afdcd69c7dcbd5
+        type: string
+    type: object
+  server.HealthStatus:
+    properties:
+      status:
+        example: healthy
+        type: string
+    type: object
+  server.ServerConfig:
+    properties:
+      'api_version  example:':
+        type: string
+      host:
+        example: sha256:https://registry.com
+        type: string
+    type: object
+  server.Token:
+    properties:
+      token:
+        example: 123.456.789
+        type: string
+    type: object
+info:
+  contact:
+    url: https://*****/confluence/spaces/viewspace.action?key=CICDTOOLS
+  description: These APIs provide services for using HarborUtiuls.
+  title: HarborUtils API
+  version: "1.0"
+paths:
+  /artifact/check_sha:
+    get:
+      consumes:
+      - application/json
+      description: 'Check image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}'
+      parameters:
+      - description: Harbor url
+        in: query
+        name: host
+        type: string
+      - description: image name
+        in: query
+        name: image
+        required: true
+        type: string
+      - description: sha digest
+        in: query
+        name: targetDigest
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.ArtifactCheckSha'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/server.APIError'
+      security:
+      - BasicAuth: []
+      - ApiKeyAuth: []
+      summary: Check image digest from Harbor
+  /artifact/sha:
+    get:
+      consumes:
+      - application/json
+      description: 'get image digest from Harbor, harbor api: /projects/{project_name}/repositories/{repository_name}/artifacts/{reference}'
+      parameters:
+      - description: Harbor url
+        in: query
+        name: host
+        type: string
+      - description: image name
+        in: query
+        name: image
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.ArtifactSha'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/server.APIError'
+      security:
+      - BasicAuth: []
+      - ApiKeyAuth: []
+      summary: Get image digest from Harbor
+  /config:
+    get:
+      description: The endpoint returns the Api Config.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.ServerConfig'
+      summary: API Config
+  /health:
+    get:
+      description: The endpoint returns the health stauts of the system.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.HealthStatus'
+      summary: Health check API
+  /jwt:
+    get:
+      consumes:
+      - application/json
+      description: get Bearer, using https://github.com/goharbor/harbor/issues/13683#issuecomment-739036574
+      parameters:
+      - description: Oidc client id for authentication
+        in: query
+        name: client_id
+        type: string
+      - description: Azure tenant for oidc authentication
+        in: query
+        name: tenant_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/server.Token'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/server.APIError'
+      security:
+      - BasicAuth: []
+      summary: Get Bearer to use harborUtils or Harbor Api
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Token
+    type: apiKey
+  BasicAuth:
+    type: basic
+swagger: "2.0"
