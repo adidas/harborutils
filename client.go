@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"strings"
 	////Uncomment for debug
 	//"io"
 	//"os"
@@ -69,8 +68,7 @@ func client(c ClientPrt) (*http.Response, string) {
 	}
 
 	//fmt.Printf("+ curl -X %s %v <<< %v\n", c.Method, c.Url, buf.String())
-
-	req, err := http.NewRequest(c.Method, c.Url, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest(c.Method, c.Url, &buf)
 	if err != nil {
 
 		log.Fatal(err)
