@@ -53,9 +53,15 @@ func getReplicationTaksByPolicyName(server, user, password, api, policyName stri
 	for _, rpe := range rpes {
 		// todo use goroutines/channels
 		t := getReplicationTask(server, user, password, api, rpe.ID)
-		for _, aux := range t {
-			b, _ := json.Marshal(aux)
+		// when it has not been able to run a replication, for example due to redis failure
+		if len(t) == 0 {
+			b, _ := json.Marshal(rpe)
 			fmt.Println(string(b))
+		} else {
+			for _, aux := range t {
+				b, _ := json.Marshal(aux)
+				fmt.Println(string(b))
+			}
 		}
 	}
 }
