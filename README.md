@@ -117,3 +117,4 @@ Releases
 * 1.1.0 - Add server
 * 1.1.1 - fix oidctocket request
 * 1.1.2 - Add error message when job can't run the replication in  replicationTaks command
+* 1.1.3 - Only error when replication job fail
